@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { registerUser, clearAuthError } from '../features/auth/authSlice.js'
-
+import { useEffect} from 'react'
 export default function Register(){
     const error = useSelector(state=>state.auth.error)
     const currentUser = useSelector((state) => state.auth.currentUser)
@@ -40,45 +40,41 @@ export default function Register(){
         // Step 7: dispatch registerUser(form) here
 
         dispatch(registerUser(form))
-        if(currentUser){
-            return <Navigate to="/events" replace/> 
-        }
-    
+    }
+    if(currentUser){
+        return <Navigate to="/events" replace/> 
     }
     return(
         <>  
           <form  onSubmit = {handleSubmit}>  
             <h1>Register</h1>
             <label htmlFor = "name">Name</label>
-            <input>
+            <input
                 id ="name" 
                 name="name" 
                 value={form.name} 
-                onChange ={handleChange}
+                onChange ={handleChange}            
+            />
 
-                
-            </input>
-
-            <label htmlFor = "email">Name</label>
-            <input>
-                id ="name" 
-                name="name"
+            <label htmlFor = "email">Email</label>
+            <input
+                id ="email" 
+                name="email"
                 type="email" 
                 value={form.email} 
                 onChange ={handleChange}
+            />
 
-            </input>
-
-            <label htmlFor = "password">Name</label>
-            <input>
-                id ="name" 
-                name="name"
+            <label htmlFor = "password">Password</label>
+            <input
+                id ="password" 
+                name="password"
                 type="password" 
                 value={form.password} 
                 onChange ={handleChange}
-            </input>
+            />
+            {error && <p role="alert">{error}</p>}
             <button type = "submit">Submit credentials</button>
-
           </form>
         </>
 );
