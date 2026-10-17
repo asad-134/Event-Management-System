@@ -1,4 +1,27 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
+export const fetchEvents = createAsyncThunk(
+    'events/fetchEvents',
+    async (filters = { keyword: '', category: '' }, thunkAPI) => {
+        const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json')
+        url.searchParams.set('apikey', import.meta.env.VITE_TICKETMASTER_API_KEY)
+        url.searchParams.set('size', '20')
+        url.searchParams.set('sort', 'date,asc')
+
+        if (filters.keyword.trim()) {
+            url.searchParams.set('keyword', filters.keyword.trim())
+        }
+        if (filters.category) {
+            url.searchParams.set('classificationName', filters.category)
+        }
+        const response = await fetch(url, { signal: thunkAPI.signal })
+        if (!response.ok) {
+            throw new Error('Could not load events')
+        }
+        const data = await response.json()
+        return data._embedded?.events ?? []
+    },
+)
 
 const events = createSlice({
     name: 'events',
@@ -10,7 +33,23 @@ const events = createSlice({
             error:null,
         },
     reducers: {
-//add async fetching here later
+
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchEvents.pending, (state) => {
+                state.status = 'loading'
+                state.error = null
+            })
+            .addCase(fetchEvents.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.items = action.payload
+            })
+            .addCase(fetchEvents.rejected, (state, action) => {
+                if (action.meta.aborted) return
+                state.status = 'failed'
+                state.error = action.error.message
+            })
     },
 })
 

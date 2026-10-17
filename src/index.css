@@ -115,3 +115,30 @@ code {
   gap: 1rem;
   padding: 1rem;
 }
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.event-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.event-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.event-card-content {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+}
