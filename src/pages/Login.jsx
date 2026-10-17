@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { loginUser, clearAuthError } from '../features/auth/authSlice.js'
 
 export default function Login() {
   const dispatch = useDispatch()
+  const location = useLocation()
   const error = useSelector((state) => state.auth.error)
   const currentUser = useSelector((state) => state.auth.currentUser)
 
@@ -41,6 +42,7 @@ export default function Login() {
     <>
       <form onSubmit={handleSubmit}>
         <h1>Welcome back</h1>
+        {location.state?.message && <p role="status">{location.state.message}</p>}
 
         <label htmlFor="email">Email</label>
         <input

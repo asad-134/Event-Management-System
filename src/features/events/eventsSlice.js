@@ -23,6 +23,23 @@ export const fetchEvents = createAsyncThunk(
     },
 )
 
+export const fetchEventById = createAsyncThunk(
+    'events/fetchEventById',
+    async (id, thunkAPI) => {
+        const url = new URL(
+            `https://app.ticketmaster.com/discovery/v2/events/${encodeURIComponent(id)}.json`
+        )
+        url.searchParams.set('apikey', import.meta.env.VITE_TICKETMASTER_API_KEY)
+
+        const response = await fetch(url, { signal: thunkAPI.signal })
+        if (!response.ok) {
+            throw new Error('Could not load event')
+        }
+
+        return response.json()
+    },
+)
+
 const events = createSlice({
     name: 'events',
         initialState: {
@@ -48,6 +65,20 @@ const events = createSlice({
             .addCase(fetchEvents.rejected, (state, action) => {
                 if (action.meta.aborted) return
                 state.status = 'failed'
+                state.error = action.error.message
+            })
+            .addCase(fetchEventById.pending, (state) => {
+                state.detailStatus = 'loading'
+                state.selectedEvent = null
+                state.error = null
+            })
+            .addCase(fetchEventById.fulfilled, (state, action) => {
+                state.detailStatus = 'succeeded'
+                state.selectedEvent = action.payload
+            })
+            .addCase(fetchEventById.rejected, (state, action) => {
+                if (action.meta.aborted) return
+                state.detailStatus = 'failed'
                 state.error = action.error.message
             })
     },
