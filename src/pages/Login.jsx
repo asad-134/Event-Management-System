@@ -21,6 +21,7 @@ export default function Login() {
   function handleChange(e) {
     const { name, value } = e.target
     setForm((previous) => ({ ...previous, [name]: value }))
+    if (error) dispatch(clearAuthError())
   }
 
   function handleSubmit(e) {
@@ -40,7 +41,7 @@ export default function Login() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={handleSubmit}>
         <h1>Welcome back</h1>
         {location.state?.message && <p role="status">{location.state.message}</p>}
 
@@ -49,6 +50,8 @@ export default function Login() {
           id="email"
           name="email"
           type="email"
+          required
+          autoComplete="email"
           value={form.email}
           onChange={handleChange}
         />
@@ -58,6 +61,8 @@ export default function Login() {
           id="password"
           name="password"
           type="password"
+          required
+          autoComplete="current-password"
           value={form.password}
           onChange={handleChange}
         />

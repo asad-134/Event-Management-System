@@ -9,12 +9,9 @@ export default function Events() {
   const [searchParams, setSearchParams] = useSearchParams()
   const keyword = searchParams.get('keyword') || ''
   const category = searchParams.get('category') || ''
-  const [searchInput, setSearchInput] = useState(keyword)
+  const [searchDraft, setSearchDraft] = useState({ keyword, value: keyword })
+  const searchInput = searchDraft.keyword === keyword ? searchDraft.value : keyword
   const { items, status, error } = useSelector((state) => state.events)
-
-  useEffect(() => {
-    setSearchInput(keyword)
-  }, [keyword])
 
   useEffect(() => {
     const request = dispatch(fetchEvents({ keyword, category }))
@@ -23,9 +20,8 @@ export default function Events() {
 
   function handleSearch(e) {
     e.preventDefault()
-    const nextParams = new URLSearchParams(searchParams)
     const trimmedKeyword = searchInput.trim()
-
+    const nextParams = new URLSearchParams(window.location.search)
     if (trimmedKeyword) {
       nextParams.set('keyword', trimmedKeyword)
     } else {
@@ -35,9 +31,10 @@ export default function Events() {
   }
 
   function handleCategoryChange(e) {
-    const nextParams = new URLSearchParams(searchParams)
-    if (e.target.value) {
-      nextParams.set('category', e.target.value)
+    const selectedCategory = e.target.value
+    const nextParams = new URLSearchParams(window.location.search)
+    if (selectedCategory) {
+      nextParams.set('category', selectedCategory)
     } else {
       nextParams.delete('category')
     }
@@ -45,30 +42,32 @@ export default function Events() {
   }
 
   return (
-    <main>
+    <main className="events-page">
       <h1>Events</h1>
 
-      <form onSubmit={handleSearch}>
+      <form className="search-form" onSubmit={handleSearch}>
         <label htmlFor="keyword">Search events</label>
         <input
           id="keyword"
           name="keyword"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={(e) => setSearchDraft({ keyword, value: e.target.value })}
         />
         <button type="submit">Search</button>
       </form>
 
-      <label htmlFor="category">Category</label>
-      <select id="category" value={category} onChange={handleCategoryChange}>
-        <option value="">All categories</option>
-        <option value="Music">Music</option>
-        <option value="Sports">Sports</option>
-        <option value="Arts & Theatre">Arts &amp; Theatre</option>
-      </select>
+      <div className="category-filter">
+        <label htmlFor="category">Category</label>
+        <select id="category" value={category} onChange={handleCategoryChange}>
+          <option value="">All categories</option>
+          <option value="Music">Music</option>
+          <option value="Sports">Sports</option>
+          <option value="Arts & Theatre">Arts &amp; Theatre</option>
+        </select>
+      </div>
 
-      {status === 'loading' && <p>Loading events...</p>}
-      {status === 'failed' && <p role="alert">{error}</p>}
+      {status === 'loading' && <p role="status">Loading events...</p>}
+      {status === 'failed' && <p role="alert">{error || 'Could not load events'}</p>}
       {status === 'succeeded' && (
         items.length === 0 ? (
           <p>No events found</p>

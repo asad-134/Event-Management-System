@@ -11,7 +11,10 @@ export default function EventDetails() {
   const { selectedEvent, detailStatus, error } = useSelector((state) => state.events)
   const currentUser = useSelector((state) => state.auth.currentUser)
   const registrations = useSelector((state) => state.registrations.items)
-  const [message, setMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const message = feedback?.eventId === id && feedback?.userId === currentUser?.id
+    ? feedback.text
+    : ''
   const alreadyRegistered = !!currentUser && registrations.some(
     (item) => item.userId === currentUser.id && item.eventId === id
   )
@@ -22,16 +25,12 @@ export default function EventDetails() {
     return () => request.abort()
   }, [dispatch, id])
 
-  useEffect(() => {
-    setMessage('')
-  }, [id, currentUser?.id])
-
   if (
     detailStatus === 'idle'
     || detailStatus === 'loading'
     || (detailStatus === 'succeeded' && selectedEvent?.id !== id)
   ) {
-    return <p>Loading event details...</p>
+    return <p role="status">Loading event details...</p>
   }
   if (detailStatus === 'failed') {
     return <p role="alert">{error || 'Could not load event'}</p>
@@ -53,7 +52,7 @@ export default function EventDetails() {
       return
     }
     if (alreadyRegistered) {
-      setMessage('Already registered')
+      setFeedback({ eventId: id, userId: currentUser.id, text: 'Already registered' })
       return
     }
 
@@ -66,7 +65,7 @@ export default function EventDetails() {
       venue: venue?.name ?? '',
       image: imageUrl ?? '',
     }))
-    setMessage('Registration successful')
+    setFeedback({ eventId: id, userId: currentUser.id, text: 'Registration successful' })
   }
 
   return (

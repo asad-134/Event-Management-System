@@ -22,6 +22,7 @@ export default function Register(){
         //If the user types in the email input, name contains "email"
         const { name, value } = e.target;
         setForm(previous => ({ ...previous, [name]: value }));
+        if (error) dispatch(clearAuthError())
 
     }
     function handleSubmit(e) {
@@ -46,12 +47,15 @@ export default function Register(){
     }
     return(
         <>  
-          <form  onSubmit = {handleSubmit}>  
+          <form className="auth-form" onSubmit = {handleSubmit}>
             <h1>Register</h1>
             <label htmlFor = "name">Name</label>
             <input
                 id ="name" 
                 name="name" 
+                type="text"
+                required
+                autoComplete="name"
                 value={form.name} 
                 onChange ={handleChange}            
             />
@@ -61,6 +65,8 @@ export default function Register(){
                 id ="email" 
                 name="email"
                 type="email" 
+                required
+                autoComplete="email"
                 value={form.email} 
                 onChange ={handleChange}
             />
@@ -70,6 +76,9 @@ export default function Register(){
                 id ="password" 
                 name="password"
                 type="password" 
+                required
+                minLength={6}
+                autoComplete="new-password"
                 value={form.password} 
                 onChange ={handleChange}
             />
