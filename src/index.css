@@ -154,3 +154,7 @@ code {
   margin: 0 auto 1rem;
   object-fit: contain;
 }
+
+.my-events {
+  padding: 1rem;
+}
